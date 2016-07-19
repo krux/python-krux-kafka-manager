@@ -1,0 +1,2 @@
+python-krux-kafka-manager
+===============
