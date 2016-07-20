@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 import krux.cli
 from krux.cli import get_group
-from krux_kafka_manager.kafka_manager import NAME, KafkaManager, get_kafka_manager, add_kafka_manager_cli_arguments
+from krux_kafka_manager.kafka_manager_api import NAME, KafkaManagerAPI, get_kafka_manager_api, add_kafka_manager_api_cli_arguments
 
 
 class Application(krux.cli.Application):
@@ -30,7 +30,7 @@ class Application(krux.cli.Application):
         # Call to the superclass to bootstrap.
         super(Application, self).__init__(name=name)
 
-        self.kafka_manager = get_kafka_manager(args=self.args, logger=self.logger, stats=self.stats)
+        self.kafka_manager_api = get_kafka_manager_api(args=self.args, logger=self.logger, stats=self.stats)
 
     def add_cli_arguments(self, parser):
         """
@@ -38,15 +38,13 @@ class Application(krux.cli.Application):
 
         :argument parser: parser instance to which the arguments will be added
         """
-        super(Application, self).add_cli_arguments(parser)
         parser.set_defaults(log_level='info')
-        add_kafka_manager_cli_arguments(parser)
+        add_kafka_manager_api_cli_arguments(parser)
         group = get_group(parser, self.name)
 
     def run(self):
-        get_brokers_skew = self.kafka_manager.get_brokers_skew("kafka-manager-test", "test")
-        self.logger.info(get_brokers_skew)
-
+        get_brokers_skew = self.kafka_manager_api.get_brokers_skew('krux-manager-test', 'test')
+        self.logger.debug(get_brokers_skew)
 
 def main():
     app = Application()
@@ -56,4 +54,3 @@ def main():
 # Run the application stand alone
 if __name__ == '__main__':
     main()
-
