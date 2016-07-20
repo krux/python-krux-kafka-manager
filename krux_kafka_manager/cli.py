@@ -33,7 +33,8 @@ class Application(krux.cli.Application):
 
         self.logger = get_logger(name)
 
-        self.kafka_manager = get_kafka_manager(args-self.args, logger=self.logger, stats=self.stats)
+        self.kafka_manager = get_kafka_manager(args=self.args, logger=self.logger, stats=self.stats)
+
 
     def add_cli_arguments(self, parser):
         """
@@ -45,8 +46,20 @@ class Application(krux.cli.Application):
 
         group = get_group(parser, self.name)
 
+        group.add_argument(
+            "-c, --cluster",
+            type=str,
+            help="Kafka cluster name.",
+        )
+
+        group.add_argument(
+            "-t, --topic",
+            type=str,
+            help="Kafka topic name.",
+        )
+
     def run(self):
-        get_brokers_skew = self.kafka_manager.get_brokers_skew()
+        get_brokers_skew = self.kafka_manager.get_brokers_skew(self.args.cluster, self.args.topic)
         self.logger.debug(get_brokers_skew)
 
 
