@@ -23,7 +23,7 @@ from __future__ import absolute_import
 import krux.cli
 from krux.logging import get_logger
 from krux.cli import get_group
-from krux_kafka_manager.kafka_manager import NAME, KafkaManager, get_kafka_manager
+from krux_kafka_manager.kafka_manager import NAME, KafkaManager, get_kafka_manager, add_kafka_manager_cli_arguments
 
 
 class Application(krux.cli.Application):
@@ -34,7 +34,6 @@ class Application(krux.cli.Application):
         self.logger = get_logger(name)
 
         self.kafka_manager = get_kafka_manager(args=self.args, logger=self.logger, stats=self.stats)
-
 
     def add_cli_arguments(self, parser):
         """
