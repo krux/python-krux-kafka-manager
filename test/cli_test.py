@@ -26,6 +26,25 @@ from krux_kafka_manager.cli import Application, NAME, main
 
 class CLItest(unittest.TestCase):
 
+    def setup_testcase(self):
+        return
+
+    def setup(self):
+        return
+
+    def cleanup(self):
+        return
+
+    def cleanup_testcase(self):
+        return
+
+    # self.mock_request = MagicMock()
+
+    # @patch('request', self.mock_request)
+    # def test_request
+    #     self.mock_requets.get.return_value.json.return_value = {}
+    #     side_effect = ValueError()
+
     # @patch('krux_kafka_manager.cli.EC2EventChecker')
     # @patch('aws_analysis_tools.ec2_events.cli.FlowdockListener')
     # @patch('aws_analysis_tools.ec2_events.cli.JiraListener')
@@ -76,6 +95,7 @@ class CLItest(unittest.TestCase):
     #         stats=app.stats
     #     )
 
+    @patch('sys.argv', ['krux-kafka', 'host'])
     def test_add_cli_arguments(self):
         """
         All arguments from Kafka Manager API are present in the args
