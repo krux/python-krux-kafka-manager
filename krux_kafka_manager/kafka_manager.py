@@ -60,7 +60,7 @@ def add_kafka_manager_cli_arguments(parser):
     group.add_argument(
         "--hostname",
         type=str,
-        default="kafka-manager.krxd.net",
+        default="http://kafka-manager.krxd.net",
         help="Kafka Manager hostname. (default: %(default)s)",
     )
 
@@ -79,7 +79,6 @@ class KafkaManager(object):
         self._name = NAME
         self._logger = logger or get_logger(self._name)
         self._stats = stats or get_stats(prefix=self._name)
-
         self._hostname = hostname
 
     def get_brokers_skew(self, cluster, topic):
