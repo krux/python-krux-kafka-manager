@@ -60,7 +60,8 @@ class Application(krux.cli.Application):
         )
 
     def run(self):
-        get_brokers_skew = self.kafka_manager.get_brokers_skew(self.args.cluster, self.args.topic)
+        print self.args
+        get_brokers_skew = self.kafka_manager.get_brokers_skew(self.args.c, self.args.t)
         self.logger.debug(get_brokers_skew)
 
 
