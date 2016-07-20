@@ -41,18 +41,20 @@ class Application(krux.cli.Application):
 
         :argument parser: parser instance to which the arguments will be added
         """
+        #super(Application, self).add_cli_arguments(parser)
+
         add_kafka_manager_cli_arguments(parser)
 
         group = get_group(parser, self.name)
 
         group.add_argument(
-            "-c, --cluster",
+            "-c",
             type=str,
             help="Kafka cluster name.",
         )
 
         group.add_argument(
-            "-t, --topic",
+            "-t",
             type=str,
             help="Kafka topic name.",
         )
