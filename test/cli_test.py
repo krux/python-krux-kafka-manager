@@ -24,19 +24,8 @@ from mock import MagicMock, patch
 from krux_kafka_manager.cli import Application, NAME, main
 
 
+@patch('sys.argv', ['krux-kafka', 'host'])
 class CLItest(unittest.TestCase):
-
-    def setup_testcase(self):
-        return
-
-    def setup(self):
-        return
-
-    def cleanup(self):
-        return
-
-    def cleanup_testcase(self):
-        return
 
     # self.mock_request = MagicMock()
 
@@ -95,7 +84,6 @@ class CLItest(unittest.TestCase):
     #         stats=app.stats
     #     )
 
-    @patch('sys.argv', ['krux-kafka', 'host'])
     def test_add_cli_arguments(self):
         """
         All arguments from Kafka Manager API are present in the args
