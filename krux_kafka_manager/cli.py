@@ -38,13 +38,15 @@ class Application(krux.cli.Application):
 
         :argument parser: parser instance to which the arguments will be added
         """
-        parser.set_defaults(log_level='info')
+
+        super(Application, self).add_cli_arguments(parser)
+
         add_kafka_manager_api_cli_arguments(parser)
         group = get_group(parser, self.name)
 
     def run(self):
         get_brokers_skew = self.kafka_manager_api.get_brokers_skew('krux-manager-test', 'test')
-        self.logger.debug(get_brokers_skew)
+        self.logger.info(get_brokers_skew)
 
 def main():
     app = Application()
