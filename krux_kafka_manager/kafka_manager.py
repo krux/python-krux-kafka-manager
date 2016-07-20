@@ -13,10 +13,11 @@ Class to retrieve data from Kafka clusters
 #
 # Third party libraries
 #
-
+import requests
 
 #
 # Internal libraries
 #
 
 
+def get_brokers_skew_percentage(cluster, topic):
