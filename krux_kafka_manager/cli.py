@@ -21,7 +21,6 @@ from __future__ import absolute_import
 #
 
 import krux.cli
-from krux.logging import get_logger
 from krux.cli import get_group
 from krux_kafka_manager.kafka_manager import NAME, KafkaManager, get_kafka_manager, add_kafka_manager_cli_arguments
 
@@ -31,8 +30,6 @@ class Application(krux.cli.Application):
         # Call to the superclass to bootstrap.
         super(Application, self).__init__(name=name)
 
-        self.logger = get_logger(name)
-
         self.kafka_manager = get_kafka_manager(args=self.args, logger=self.logger, stats=self.stats)
 
     def add_cli_arguments(self, parser):
@@ -41,26 +38,13 @@ class Application(krux.cli.Application):
 
         :argument parser: parser instance to which the arguments will be added
         """
-        #super(Application, self).add_cli_arguments(parser)
+        super(Application, self).add_cli_arguments(parser)
         parser.set_defaults(log_level='info')
         add_kafka_manager_cli_arguments(parser)
-
         group = get_group(parser, self.name)
 
-        group.add_argument(
-            "-c", "--cluster",
-            type=str,
-            help="Kafka cluster name.",
-        )
-
-        group.add_argument(
-            "-t", "--topic",
-            type=str,
-            help="Kafka topic name.",
-        )
-
     def run(self):
-        get_brokers_skew = self.kafka_manager.get_brokers_skew(self.args.cluster, self.args.topic)
+        get_brokers_skew = self.kafka_manager.get_brokers_skew("kafka-manager-test", "test")
         self.logger.info(get_brokers_skew)
 
 

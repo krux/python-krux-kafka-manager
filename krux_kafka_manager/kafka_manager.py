@@ -58,10 +58,9 @@ def add_kafka_manager_cli_arguments(parser):
     group = get_group(parser, NAME)
 
     group.add_argument(
-        "--hostname",
+        "hostname",
         type=str,
-        default="http://kafka-manager.krxd.net",
-        help="Kafka Manager hostname. (default: %(default)s)",
+        help="Kafka Manager hostname.",
     )
 
 
