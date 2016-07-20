@@ -33,7 +33,7 @@ class Application(krux.cli.Application):
 
         self.logger = get_logger(name)
 
-        self.kafka_manager = get_kafka_manager(args-self.args, logger=self.logger, stats=self.stats)
+        self.kafka_manager = get_kafka_manager(args=self.args, logger=self.logger, stats=self.stats)
 
     def add_cli_arguments(self, parser):
         """

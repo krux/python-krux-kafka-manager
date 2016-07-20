@@ -63,18 +63,6 @@ def add_kafka_manager_cli_arguments(parser):
         help="Kafka Manager hostname. (default: %(default)s)",
     )
 
-    group.add_argument(
-        "-c, --cluster",
-        type=str,
-        help="Kafka cluster name.",
-    )
-
-    group.add_argument(
-        "-t, --topic",
-        type=str,
-        help="Kafka topic name.",
-    )
-
 class KafkaManager(object):
     """
     A manager to handle all Kafka Manager related functions.
@@ -94,4 +82,4 @@ class KafkaManager(object):
 
     def get_brokers_skew(self, cluster, topic):
         r = requests.get('%s/api/status/%s/%s/brokersSkewPercentage' % (self._hostname, cluster, topic))
-        print(r.json()['brokersSkewPercentage'])
+        return r.json()['brokersSkewPercentage']
