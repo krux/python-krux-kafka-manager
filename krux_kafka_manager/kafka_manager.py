@@ -25,7 +25,7 @@ from krux.cli import get_parser, get_group
 NAME = 'krux-kafka-manager'
 
 
-def get_kafka_manager(args=None, logger=None, stats=None):
+def get_kafka_manager(args=None, logger=None, stats=None): # TODO
     """
     Return a usable Kafka Manager object without creating a class around it.
     In the context of a krux.cli (or similar) interface the 'args', 'logger'
@@ -34,7 +34,7 @@ def get_kafka_manager(args=None, logger=None, stats=None):
     """
     if not args:
         parser = get_parser(description=NAME)
-        add_iam_cli_arguments(parser)
+        add_kafka_manager_cli_arguments(parser)
         args = parser.parse_args()
 
     if not logger:
@@ -44,6 +44,7 @@ def get_kafka_manager(args=None, logger=None, stats=None):
         stats = get_stats(prefix=NAME)
 
     return KafkaManager(
+        hostname=args.hostname,
         logger=logger,
         stats=stats,
     )
