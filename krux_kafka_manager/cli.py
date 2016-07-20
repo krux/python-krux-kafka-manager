@@ -42,26 +42,26 @@ class Application(krux.cli.Application):
         :argument parser: parser instance to which the arguments will be added
         """
         #super(Application, self).add_cli_arguments(parser)
-
+        parser.set_defaults(log_level='info')
         add_kafka_manager_cli_arguments(parser)
 
         group = get_group(parser, self.name)
 
         group.add_argument(
-            "-c",
+            "-c", "--cluster",
             type=str,
             help="Kafka cluster name.",
         )
 
         group.add_argument(
-            "-t",
+            "-t", "--topic",
             type=str,
             help="Kafka topic name.",
         )
 
     def run(self):
-        get_brokers_skew = self.kafka_manager.get_brokers_skew(self.args.c, self.args.t)
-        self.logger.debug(get_brokers_skew)
+        get_brokers_skew = self.kafka_manager.get_brokers_skew(self.args.cluster, self.args.topic)
+        self.logger.info(get_brokers_skew)
 
 
 def main():
