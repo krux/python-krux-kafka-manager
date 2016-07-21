@@ -43,6 +43,9 @@ class Application(krux.cli.Application):
         get_brokers_skew = self.kafka_manager_api.get_brokers_skew('krux-manager-test', 'test')
         self.logger.info(get_brokers_skew)
 
+        get_topic_list = self.kafka_manager_api.get_topic_list('krux-manager-test')
+        self.logger.info(get_topic_list)
+
 
 def main():
     app = Application()
