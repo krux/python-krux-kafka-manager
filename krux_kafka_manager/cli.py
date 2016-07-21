@@ -13,10 +13,6 @@ CLI tools for accessing Krux Kafka Clusters
 from __future__ import absolute_import
 
 #
-# Third party libraries
-#
-
-#
 # Internal libraries
 #
 

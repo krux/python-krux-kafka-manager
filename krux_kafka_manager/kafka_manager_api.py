@@ -54,7 +54,7 @@ def add_kafka_manager_api_cli_arguments(parser):
     """
     Utility function for adding Kafka Manager specific CLI arguments.
     """
-    # Add those specific to the application    
+    # Add those specific to the application
     group = get_group(parser, NAME)
 
     group.add_argument(
@@ -81,5 +81,8 @@ class KafkaManagerAPI(object):
         self._hostname = hostname
 
     def get_brokers_skew(self, cluster, topic):
-        r = requests.get('%s/api/status/%s/%s/brokersSkewPercentage' % (self._hostname, cluster, topic))
+        """
+        Returns brokers skew percentage for the given cluster and topic.
+        """
+        r = requests.get('{hostname}/api/status/{cluster}/{topic}/brokersSkewPercentage'.format(self._hostname, cluster, topic))
         return r.json()['brokersSkewPercentage']
