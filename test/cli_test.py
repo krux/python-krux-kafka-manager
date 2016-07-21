@@ -21,68 +21,42 @@ from mock import MagicMock, patch
 # Internal libraries
 #
 
+from krux.stats import DummyStatsClient
 from krux_kafka_manager.cli import Application, NAME, main
+from krux_kafka_manager.kafka_manager_api import KafkaManagerAPI
+from krux.cli import get_group
 
 
 @patch('sys.argv', ['krux-kafka', 'host'])
 class CLItest(unittest.TestCase):
 
-    # self.mock_request = MagicMock()
+    def test_init(self):
+        """
+        CLI constructor creates all the required private properties
+        """
+        self.app = Application()
 
-    # @patch('request', self.mock_request)
-    # def test_request
-    #     self.mock_requets.get.return_value.json.return_value = {}
-    #     side_effect = ValueError()
+        # There are not much we can test except all the objects are under the correct name
+        self.assertEqual(NAME, self.app.name)
+        self.assertEqual(NAME, self.app.parser.description)
+        # The dummy stats client has no awareness of the name. Just check the class.
+        self.assertIsInstance(self.app.stats, DummyStatsClient)
+        self.assertEqual(NAME, self.app.logger.name)
 
-    # @patch('krux_kafka_manager.cli.EC2EventChecker')
-    # @patch('aws_analysis_tools.ec2_events.cli.FlowdockListener')
-    # @patch('aws_analysis_tools.ec2_events.cli.JiraListener')
-    # def test_init_all_none(self, mock_jira, mock_flowdock, mock_checker):
-    #     """
-    #     Application is only created with the checker when no CLI arguments are passed
-    #     """
-    #     app = Application()
+        self.assertIsInstance(self.app.kafka_manager_api, KafkaManagerAPI)
 
-    #     mock_checker.assert_called_once_with(
-    #         boto=app.boto,
-    #         name=NAME,
-    #         logger=app.logger,
-    #         stats=app.stats
-    #     )
-    #     self.assertFalse(mock_flowdock.called)
-    #     self.assertFalse(mock_jira.called)
+    @patch('krux_kafka_manager.cli.get_kafka_manager_api')
+    def test_init_all_set(self, mock_getter):
+        """
+        Kafka Manager API is created properly.
+        """
+        app = Application()
 
-    # @patch.object(sys, 'argv', ['prog', '--jira-username', JIRA_USERNAME, '--jira-password', JIRA_PASSWORD, '--jira-base-url', JIRA_BASE_URL, '--flowdock-token', FLOW_TOKEN, '--urgent', FLOW_URGENT])
-    # @patch('aws_analysis_tools.ec2_events.cli.EC2EventChecker')
-    # @patch('aws_analysis_tools.ec2_events.cli.FlowdockListener')
-    # @patch('aws_analysis_tools.ec2_events.cli.JiraListener')
-    # def test_init_all_set(self, mock_jira, mock_flowdock, mock_checker):
-    #     """
-    #     Flowdock and JIRA listeners are created correctly when all CLI arguments are passed
-    #     """
-    #     app = Application()
-
-    #     mock_checker.assert_called_once_with(
-    #         boto=app.boto,
-    #         name=NAME,
-    #         logger=app.logger,
-    #         stats=app.stats
-    #     )
-    #     mock_flowdock.assert_called_once_with(
-    #         flow_token=self.FLOW_TOKEN,
-    #         name=NAME,
-    #         logger=app.logger,
-    #         stats=app.stats
-    #     )
-    #     self.assertEqual(mock_flowdock.return_value.urgent_threshold, int(self.FLOW_URGENT))
-    #     mock_jira.assert_called_once_with(
-    #         username=self.JIRA_USERNAME,
-    #         password=self.JIRA_PASSWORD,
-    #         base_url=self.JIRA_BASE_URL,
-    #         name=NAME,
-    #         logger=app.logger,
-    #         stats=app.stats
-    #     )
+        mock_getter.assert_called_once_with(
+            args=app.args,
+            logger=app.logger,
+            stats=app.stats
+        )
 
     def test_add_cli_arguments(self):
         """
@@ -92,17 +66,17 @@ class CLItest(unittest.TestCase):
 
         self.assertIn('hostname', app.args)
 
-    # def test_run(self):
-    #     """
-    #     Checker's check() method is correctly called in app.run()
-    #     """
-    #     checker = MagicMock()
+    def test_run(self):
+        """
+        Kafka Manager API's get_brokers_skew method is correctly called in app.run()
+        """
+        manager = MagicMock()
 
-    #     with patch('aws_analysis_tools.ec2_events.cli.EC2EventChecker', return_value=checker):
-    #         app = Application()
-    #         app.run()
+        with patch('krux_kafka_manager.cli.get_kafka_manager_api', return_value=manager):
+            app = Application()
+            app.run()
 
-    #     checker.check.assert_called_once_with()
+        manager.get_brokers_skew.assert_called_once_with('krux-manager-test', 'test')
 
     def test_main(self):
         """
