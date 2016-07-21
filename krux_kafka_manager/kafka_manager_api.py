@@ -54,7 +54,7 @@ def add_kafka_manager_api_cli_arguments(parser):
     """
     Utility function for adding Kafka Manager specific CLI arguments.
     """
-    # Add those specific to the application    
+    # Add those specific to the application
     group = get_group(parser, NAME)
 
     group.add_argument(
