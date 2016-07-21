@@ -20,6 +20,7 @@ import krux.cli
 from krux_kafka_manager.kafka_manager_api import NAME, KafkaManagerAPI, get_kafka_manager_api, add_kafka_manager_api_cli_arguments
 
 
+# CLI for testing purposes
 class Application(krux.cli.Application):
     def __init__(self, name=NAME):
         # Call to the superclass to bootstrap.
@@ -33,7 +34,6 @@ class Application(krux.cli.Application):
 
         :argument parser: parser instance to which the arguments will be added
         """
-
         super(Application, self).add_cli_arguments(parser)
 
         add_kafka_manager_api_cli_arguments(parser)
@@ -42,6 +42,7 @@ class Application(krux.cli.Application):
     def run(self):
         get_brokers_skew = self.kafka_manager_api.get_brokers_skew('krux-manager-test', 'test')
         self.logger.info(get_brokers_skew)
+
 
 def main():
     app = Application()
