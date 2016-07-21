@@ -21,7 +21,6 @@ from __future__ import absolute_import
 #
 
 import krux.cli
-from krux.cli import get_group
 from krux_kafka_manager.kafka_manager_api import NAME, KafkaManagerAPI, get_kafka_manager_api, add_kafka_manager_api_cli_arguments
 
 
@@ -42,7 +41,7 @@ class Application(krux.cli.Application):
         super(Application, self).add_cli_arguments(parser)
 
         add_kafka_manager_api_cli_arguments(parser)
-        group = get_group(parser, self.name)
+        group = krux.cli.get_group(parser, self.name)
 
     def run(self):
         get_brokers_skew = self.kafka_manager_api.get_brokers_skew('krux-manager-test', 'test')
