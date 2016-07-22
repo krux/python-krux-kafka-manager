@@ -50,21 +50,6 @@ class KafkaManagerTest(unittest.TestCase):
         self.mock_logger.assert_called_once_with(self.manager._name)
         self.mock_stats.assert_called_once_with(prefix=self.manager._name)
 
-    # @patch('krux_kafka_manager.kafka_manager_api.get_stats')
-    # @patch('krux_kafka_manager.kafka_manager_api.get_logger')
-    # @patch('krux_kafka_manager.kafka_manager_api.KafkaManagerAPI')
-    # def test_get_kafka_manager_api(self, mock_kafka_manager, mock_logger, mock_stats):
-    #     mock_kafka_manager.return_value = MagicMock()
-    #     mock_args = MagicMock(hostname='test_hostname')
-    #     app = get_kafka_manager_api(mock_args)
-    #     mock_logger.assert_called_once_with(name=NAME)
-    #     mock_stats.assert_called_once_with(prefix=NAME)
-    #     mock_kafka_manager.assert_called_once_with(
-    #             hostname='test_hostname',
-    #             logger=mock_logger(name=NAME),
-    #             stats=mock_stats(prefix=NAME),
-    #             )
-
     @patch('krux_kafka_manager.kafka_manager_api.KafkaManagerAPI')
     def test_get_kafka_manager_api_all_inputs(self, mock_kafka_manager):
         """
