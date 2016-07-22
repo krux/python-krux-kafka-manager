@@ -43,6 +43,26 @@ class Application(krux.cli.Application):
         get_brokers_skew = self.kafka_manager_api.get_brokers_skew('krux-manager-test', 'test')
         self.logger.info(get_brokers_skew)
 
+        get_topic_list = self.kafka_manager_api.get_topic_list('krux-manager-test')
+        self.logger.info(get_topic_list)
+
+        all_clusters = self.kafka_manager_api.get_cluster_list()
+        self.logger.info(all_clusters)
+
+        active_clusters = self.kafka_manager_api.get_cluster_list(params={"status": "active"})
+        self.logger.info(active_clusters)
+
+        pending_clusters = self.kafka_manager_api.get_cluster_list(params={"status": "pending"})
+        self.logger.info(pending_clusters)
+
+        # for cluster in all_clusters:
+        #     for topic in get_topic_list:
+        #         self.logger.info('Cluster {cluster} - Topic {topic} - Broker Skew Percentage: {skew}'.format(
+        #                 cluster=cluster['name'],
+        #                 topic=topic,
+        #                 skew=self.kafka_manager_api.get_brokers_skew(cluster['name'], topic)
+        #             ))
+
 
 def main():
     app = Application()
