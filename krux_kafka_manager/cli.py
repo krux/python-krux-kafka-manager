@@ -17,7 +17,7 @@ from __future__ import absolute_import
 #
 
 import krux.cli
-from krux_kafka_manager.kafka_manager_api import NAME, KafkaManagerAPI, get_kafka_manager_api, add_kafka_manager_api_cli_arguments
+from krux_kafka_manager.kafka_manager_api import NAME, get_kafka_manager_api, add_kafka_manager_api_cli_arguments
 
 
 # CLI for testing purposes
