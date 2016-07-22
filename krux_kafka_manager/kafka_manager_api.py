@@ -83,6 +83,9 @@ class KafkaManagerAPI(object):
     def get_brokers_skew(self, cluster, topic):
         """
         Returns brokers skew percentage for the given cluster and topic.
+
+        :argument cluster: Kafka cluster name as a string
+        :argument topic: Kafka topic name as a string
         """
         r = requests.get('{hostname}/api/status/{cluster}/{topic}/brokersSkewPercentage'.format(
             hostname=self._hostname,
