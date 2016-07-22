@@ -40,7 +40,7 @@ class CLItest(unittest.TestCase):
 
     def test_init(self):
         """
-        CLI constructor creates all the required private properties
+        CLI Test: CLI constructor creates all the required private properties
         """
         # There are not much we can test except all the objects are under the correct name
         self.assertEqual(NAME, self.app.name)
@@ -56,13 +56,13 @@ class CLItest(unittest.TestCase):
 
     def test_add_cli_arguments(self):
         """
-        All arguments from Kafka Manager API are present in the args
+        CLI Test: All arguments from Kafka Manager API are present in the args
         """
         self.assertIn('hostname', self.app.args)
 
     def test_run(self):
         """
-        Kafka Manager API's get_brokers_skew method is correctly called in self.app.run()
+        CLI Test: Kafka Manager API's get_brokers_skew method is correctly called in self.app.run()
         """
         self.mock_get_manager().get_brokers_skew.return_value = CLItest._BROKER_SKEW_INT
         self.app.run()
@@ -72,7 +72,7 @@ class CLItest(unittest.TestCase):
 
     def test_main(self):
         """
-        Application is instantiated and run() is called in main()
+        CLI Test: Application is instantiated and run() is called in main()
         """
         app = MagicMock()
         app_class = MagicMock(return_value=app)
