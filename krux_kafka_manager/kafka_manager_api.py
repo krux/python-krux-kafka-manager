@@ -98,5 +98,9 @@ class KafkaManagerAPI(object):
         """
         Returns brokers skew percentage for the given cluster and topic.
         """
-        r = requests.get('{hostname}/api/status/{cluster}/{topic}/brokersSkewPercentage'.format(hostname=self._hostname, cluster=cluster, topic=topic))
+        r = requests.get('{hostname}/api/status/{cluster}/{topic}/brokersSkewPercentage'.format(
+            hostname=self._hostname,
+            cluster=cluster,
+            topic=topic
+            ))
         return r.json()['brokersSkewPercentage']
