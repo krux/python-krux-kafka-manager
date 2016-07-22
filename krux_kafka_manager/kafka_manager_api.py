@@ -80,19 +80,19 @@ class KafkaManagerAPI(object):
         self._stats = stats or get_stats(prefix=self._name)
         self._hostname = hostname
 
-    def get_cluster_list(self, params):
+    def get_cluster_list(self, params=None):
         """
         Returns list containing dictionaries of information for each cluster
         """
         r = requests.get('{hostname}/api/status/clusters'.format(hostname=self._hostname), params=params)
-        return r.json()
+        return r.json()['clusters']
 
     def get_topic_list(self, cluster):
         """
         Returns dictionary containing list of topics for given cluster
         """
         r = requests.get('{hostname}/api/status/{cluster}/topics'.format(hostname=self._hostname, cluster=cluster))
-        return r.json()
+        return r.json()['topics']
 
     def get_brokers_skew(self, cluster, topic):
         """
