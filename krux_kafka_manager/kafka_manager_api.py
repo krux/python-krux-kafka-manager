@@ -29,8 +29,8 @@ def get_kafka_manager_api(args=None, logger=None, stats=None):
     """
     Return a usable Kafka Manager object without creating a class around it.
     In the context of a krux.cli (or similar) interface the 'args', 'logger'
-    and 'stats' objects should already be present. If you don't have them,
-    however, we'll attempt to provide usable ones.
+    and 'stats' objects should already be present. If they are not inputted,
+    we will provide usable ones.
     """
     if not args:
         parser = get_parser(description=NAME)
@@ -87,9 +87,9 @@ class KafkaManagerAPI(object):
         :argument cluster: Kafka cluster name as a string
         :argument topic: Kafka topic name as a string
         """
-        r = requests.get('{hostname}/api/status/{cluster}/{topic}/brokersSkewPercentage'.format(
+        request_brokers_skew = requests.get('{hostname}/api/status/{cluster}/{topic}/brokersSkewPercentage'.format(
             hostname=self._hostname,
             cluster=cluster,
             topic=topic
             ))
-        return r.json()['brokersSkewPercentage']
+        return request_brokers_skew.json()['brokersSkewPercentage']
