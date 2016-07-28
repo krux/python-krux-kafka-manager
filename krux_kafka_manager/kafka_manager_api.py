@@ -29,8 +29,8 @@ def get_kafka_manager_api(args=None, logger=None, stats=None):
     """
     Return a usable Kafka Manager object without creating a class around it.
     In the context of a krux.cli (or similar) interface the 'args', 'logger'
-    and 'stats' objects should already be present. If you don't have them,
-    however, we'll attempt to provide usable ones.
+    and 'stats' objects should already be present. If they are not inputted,
+    we will provide usable ones.
     """
     if not args:
         parser = get_parser(description=NAME)
@@ -84,23 +84,26 @@ class KafkaManagerAPI(object):
         """
         Returns list containing dictionaries of information for each cluster
         """
-        r = requests.get('{hostname}/api/status/clusters'.format(hostname=self._hostname), params=params)
-        return r.json()['clusters']
+        request_cluster_list = requests.get('{hostname}/api/status/clusters'.format(hostname=self._hostname), params=params)
+        return request_cluster_list.json()['clusters']
 
     def get_topic_list(self, cluster):
         """
         Returns dictionary containing list of topics for given cluster
         """
-        r = requests.get('{hostname}/api/status/{cluster}/topics'.format(hostname=self._hostname, cluster=cluster))
-        return r.json()['topics']
+        request_topic_list = requests.get('{hostname}/api/status/{cluster}/topics'.format(hostname=self._hostname, cluster=cluster))
+        return request_topic_list.json()['topics']
 
     def get_brokers_skew(self, cluster, topic):
         """
         Returns brokers skew percentage for the given cluster and topic.
+
+        :argument cluster: Kafka cluster name as a string
+        :argument topic: Kafka topic name as a string
         """
-        r = requests.get('{hostname}/api/status/{cluster}/{topic}/brokersSkewPercentage'.format(
+        request_brokers_skew = requests.get('{hostname}/api/status/{cluster}/{topic}/brokersSkewPercentage'.format(
             hostname=self._hostname,
             cluster=cluster,
             topic=topic
             ))
-        return r.json()['brokersSkewPercentage']
+        return request_brokers_skew.json()['brokersSkewPercentage']
