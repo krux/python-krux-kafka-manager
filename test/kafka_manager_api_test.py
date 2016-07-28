@@ -34,7 +34,7 @@ class KafkaManagerTest(unittest.TestCase):
         self.mock_logger = mock_logger
         self.mock_stats = mock_stats
         self.manager = KafkaManagerAPI(hostname=KafkaManagerTest._HOSTNAME)
-    
+
     def test_KafkaManagerAPI_all_init(self):
         """
         Checks if KafkaManagerAPI initialized property if all user inputs provided
@@ -48,7 +48,7 @@ class KafkaManagerTest(unittest.TestCase):
     def test_KafkaManagerAPI_only_hostname(self):
         """
         Checks if KafkaManagerAPI initialized properly with no user inputs except (required) hostname
-        """    
+        """
         self.mock_logger.assert_called_once_with(self.manager._name)
         self.mock_stats.assert_called_once_with(prefix=self.manager._name)
 
@@ -84,6 +84,26 @@ class KafkaManagerTest(unittest.TestCase):
         mock_stats.assert_called_once_with(prefix=NAME)
         mock_kafka_manager.assert_called_once_with(
             hostname = KafkaManagerTest._HOSTNAME,
+            logger=mock_logger(name=NAME),
+            stats=mock_stats(prefix=NAME),
+            )
+
+    @patch('krux_kafka_manager.kafka_manager_api.get_stats')
+    @patch('krux_kafka_manager.kafka_manager_api.get_logger')
+    @patch('krux_kafka_manager.kafka_manager_api.get_parser')
+    @patch('krux_kafka_manager.kafka_manager_api.add_kafka_manager_api_cli_arguments')
+    @patch('krux_kafka_manager.kafka_manager_api.KafkaManagerAPI')
+    def test_get_kafka_api_no_inputs(self, mock_kafka_manager, mock_cli_args, mock_parser, mock_logger, mock_stats):
+        """
+        Checks if get_kafka_manager_api initalizes KafkaManagerAPI object with no user inputs provided
+        (except mandatory hostname argument)
+        """
+        mock_parser.return_value.parse_args.return_value = MagicMock(hostname='test_hostname')
+        mock_kafka_manager.return_value = MagicMock()
+        manager = get_kafka_manager_api()
+        mock_cli_args.assert_called_once_with(mock_parser(description=NAME))
+        mock_kafka_manager.assert_called_once_with(
+            hostname = 'test_hostname',
             logger=mock_logger(name=NAME),
             stats=mock_stats(prefix=NAME),
             )
