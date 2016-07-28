@@ -94,6 +94,13 @@ class KafkaManagerAPI(object):
         request_topic_list = requests.get('{hostname}/api/status/{cluster}/topics'.format(hostname=self._hostname, cluster=cluster))
         return request_topic_list.json()['topics']
 
+    def get_topic_identities(self, cluster):
+        """
+        Returns dictionary containing list of topic identities for given cluster
+        """
+        request_topic_identities = requests.get('{hostname}/api/status/{cluster}/topicIdentities'.format(hostname=self._hostname, cluster=cluster))
+        return request_topic_identities.json()['topicIdentities']
+
     def get_brokers_skew(self, cluster, topic):
         """
         Returns brokers skew percentage for the given cluster and topic.
