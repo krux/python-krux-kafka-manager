@@ -48,7 +48,7 @@ class KafkaManagerTest(unittest.TestCase):
 
     def test_KafkaManagerAPI_only_hostname(self):
         """
-        Kafka Manager API Test: Checks if KafkaManagerAPI initialized properly with no user 
+        Kafka Manager API Test: Checks if KafkaManagerAPI initialized properly with no user
         inputs except (required) hostname.
         """
         self.mock_logger.assert_called_once_with(self.manager._name)
@@ -122,19 +122,6 @@ class KafkaManagerTest(unittest.TestCase):
         self.assertEqual(cluster_list, [{'name': 'cluster1', 'status': 'active'}])
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
-    def test_get_topic_list(self, mock_requests):
-        """
-        Kafka Manager API Test: Checks if get_topic_list method correctly returns list of topic names for
-        given cluster.
-        """
-        mock_requests.get.return_value.json.return_value = {'topics': ['topic1', 'topic2']}
-        topic_list = self.manager.get_topic_list('cluster')
-        mock_requests.get.assert_called_once_with('{hostname}/api/status/{cluster}/topics'.format(
-            hostname=KafkaManagerTest._HOSTNAME,
-            cluster='cluster'))
-        self.assertEqual(topic_list, ['topic1', 'topic2'])
-
-    @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_topic_identities(self, mock_requests):
         """
         Kafka Manager API Test: Checks if get_topic_identities method correctly returns topic identities
@@ -146,17 +133,3 @@ class KafkaManagerTest(unittest.TestCase):
             hostname=KafkaManagerTest._HOSTNAME,
             cluster='cluster'))
         self.assertEqual(topic_identities, [{'topic':'topic_name','partitions':50,'numBrokers':1}])
-
-    @patch('krux_kafka_manager.kafka_manager_api.requests')
-    def test_get_brokers_skew(self, mock_requests):
-        """
-        Kafka Manager API Test: Checks if get_brokers_skew method correctly returns brokersSkewPercentage
-        for given cluster and topic
-        """
-        mock_requests.get.return_value.json.return_value = {'topics':'test','brokersSkewPercentage':0}
-        brokers_skew = self.manager.get_brokers_skew('cluster', 'test')
-        mock_requests.get.assert_called_once_with('{hostname}/api/status/{cluster}/{topic}/brokersSkewPercentage'.format(
-            hostname=KafkaManagerTest._HOSTNAME,
-            cluster='cluster',
-            topic='test'))
-        self.assertEqual(brokers_skew, 0)

@@ -15,7 +15,7 @@ import sys
 # Third party libraries
 #
 
-from mock import MagicMock, patch
+from mock import MagicMock, patch, call
 
 #
 # Internal libraries
@@ -29,6 +29,7 @@ from krux_kafka_manager.kafka_manager_api import KafkaManagerAPI
 class CLItest(unittest.TestCase):
 
     _BROKER_SKEW_INT = 0
+    _EXAMPLE_LIST = ['1', '2', '3']
 
     @patch('krux_kafka_manager.cli.krux.cli.krux.logging.get_logger')
     @patch('krux_kafka_manager.cli.get_kafka_manager_api')
@@ -62,13 +63,13 @@ class CLItest(unittest.TestCase):
 
     def test_run(self):
         """
-        CLI Test: Kafka Manager API's get_brokers_skew method is correctly called in self.app.run()
+        CLI Test: Kafka Manager API's get_topic_identities method is correctly called in self.app.run()
         """
-        self.mock_get_manager().get_brokers_skew.return_value = CLItest._BROKER_SKEW_INT
+        self.mock_get_manager().get_topic_identities.return_value = CLItest._EXAMPLE_LIST
         self.app.run()
 
-        self.mock_get_manager().get_brokers_skew.assert_called_once_with('krux-manager-test', 'test')
-        self.mock_get_logger().info.assert_called_once_with(CLItest._BROKER_SKEW_INT)
+        self.mock_get_manager().get_topic_identities.assert_called_once_with('krux-manager-test')
+        self.mock_get_logger().info.assert_called_once_with(CLItest._EXAMPLE_LIST)
 
     def test_main(self):
         """
