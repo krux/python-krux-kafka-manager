@@ -11,6 +11,7 @@ CLI tools for accessing Krux Kafka Clusters
 #
 
 from __future__ import absolute_import
+from pprint import pformat
 
 #
 # Internal libraries
@@ -55,13 +56,8 @@ class Application(krux.cli.Application):
         pending_clusters = self.kafka_manager_api.get_cluster_list(params={"status": "pending"})
         self.logger.info(pending_clusters)
 
-        # for cluster in all_clusters:
-        #     for topic in get_topic_list:
-        #         self.logger.info('Cluster {cluster} - Topic {topic} - Broker Skew Percentage: {skew}'.format(
-        #                 cluster=cluster['name'],
-        #                 topic=topic,
-        #                 skew=self.kafka_manager_api.get_brokers_skew(cluster['name'], topic)
-        #             ))
+        topic_identities = self.kafka_manager_api.get_topic_identities('krux-manager-test')
+        self.logger.info(pformat(topic_identities))
 
 
 def main():
