@@ -122,6 +122,19 @@ class KafkaManagerTest(unittest.TestCase):
         self.assertEqual(cluster_list, [{'name': 'cluster1', 'status': 'active'}])
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
+    def test_get_cluster_list_status(self, mock_requests):
+        mock_requests.get.return_value.json.return_value = {
+            'clusters': { 
+                'active': [{'name': 'cluster1', 'status': 'active'}],
+                'pending': [{'name': 'cluster2', 'status': 'pending'}]
+            }
+        }
+        cluster_list = self.manager.get_cluster_list(params=None, status='pending')
+        mock_requests.get.assert_called_once_with('{hostname}/api/status/clusters'.format(
+            hostname=KafkaManagerTest._HOSTNAME), params=None)
+        self.assertEqual(cluster_list, [{'name': 'cluster2', 'status': 'pending'}])
+
+    @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_topic_identities(self, mock_requests):
         """
         Kafka Manager API Test: Checks if get_topic_identities method correctly returns topic identities
