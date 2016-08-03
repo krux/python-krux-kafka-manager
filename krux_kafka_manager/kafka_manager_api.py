@@ -80,16 +80,35 @@ class KafkaManagerAPI(object):
         self._stats = stats or get_stats(prefix=self._name)
         self._hostname = hostname
 
-    def get_cluster_list(self, params=None):
+    def get_cluster_list(self, params=None, status=None):
         """
-        Returns list containing dictionaries of information for each cluster
+        Returns list containing dictionaries of information for each cluster. User can filter for clusters
+        with certain status, else all clusters are returned.
         """
         request_cluster_list = requests.get('{hostname}/api/status/clusters'.format(hostname=self._hostname), params=params)
-        return request_cluster_list.json()['clusters']
+        cluster_list = request_cluster_list.json()['clusters']
+        if status:
+            return cluster_list[status]
+        return cluster_list
 
     def get_topic_identities(self, cluster):
         """
-        Returns dictionary containing list of topic identities for given cluster
+        Returns dictionary containing list of topic identities for given cluster. Partitions identity formatted
+        into ordered list for easier use.
         """
         request_topic_identities = requests.get('{hostname}/api/status/{cluster}/topicIdentities'.format(hostname=self._hostname, cluster=cluster))
-        return request_topic_identities.json()['topicIdentities']
+        topic_identities = request_topic_identities.json()['topicIdentities']
+        for topic_identity in topic_identities:
+            partitions_identity = []
+            for partition_id, partition_vals in topic_identity['partitionsIdentity'].iteritems():
+                partitions_identity.append(partition_vals)
+            partitions_identity = sorted(partitions_identity, key=lambda x: x['partNum'])
+            topic_identity['partitionsIdentity'] = partitions_identity
+        return topic_identities
+
+    def get_partitions_identity(self, cluster, topic):
+        """
+        Returns list of partition identities for topic of given cluster.
+        """
+        topic_identities = self.get_topic_identities(cluster)
+        return [topic_identity['partitionsIdentity'] for topic_identity in topic_identities if topic_identity['topic'] == topic]
