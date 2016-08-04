@@ -98,12 +98,6 @@ class KafkaManagerAPI(object):
         """
         request_topic_identities = requests.get('{hostname}/api/status/{cluster}/topicIdentities'.format(hostname=self._hostname, cluster=cluster))
         topic_identities = request_topic_identities.json()['topicIdentities']
-        for topic_identity in topic_identities:
-            partitions_identity = []
-            for partition_id, partition_vals in topic_identity['partitionsIdentity'].iteritems():
-                partitions_identity.append(partition_vals)
-            partitions_identity = sorted(partitions_identity, key=lambda x: x['partNum'])
-            topic_identity['partitionsIdentity'] = partitions_identity
         return topic_identities
 
     def get_partitions_identity(self, cluster, topic):
