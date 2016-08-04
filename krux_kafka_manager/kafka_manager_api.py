@@ -111,4 +111,7 @@ class KafkaManagerAPI(object):
         Returns list of partition identities for topic of given cluster.
         """
         topic_identities = self.get_topic_identities(cluster)
-        return [topic_identity['partitionsIdentity'] for topic_identity in topic_identities if topic_identity['topic'] == topic]
+        for topic_identity in topic_identities:
+            if topic_identity['topic'] == topic:
+                return topic_identity['partitionsIdentity']
+        return []

@@ -27,6 +27,30 @@ from krux_kafka_manager.kafka_manager_api import KafkaManagerAPI, get_kafka_mana
 class KafkaManagerTest(unittest.TestCase):
 
     _HOSTNAME = 'test_hostname'
+    CLUSTER = 'cluster'
+    TOPIC = 'topic_name'
+    PARAMS = 'params'
+    STATUS = 'active'
+    CLUSTER_LIST_REQUEST = {'clusters':[{'name': 'cluster1', 'status': 'active'}]}
+    CLUSTER_LIST_STATUS = {
+            'clusters': { 
+                'active': [{'name': 'cluster1', 'status': 'active'}],
+                'pending': [{'name': 'cluster2', 'status': 'pending'}]
+            }
+        }
+    CLUSTER_LIST_RV =  [{'name': 'cluster1', 'status': 'active'}]
+    TOPIC_IDENTITIES_REQUEST = {
+            'topicIdentities':[
+                {
+                    'topic':'topic_name',
+                    'partitionsIdentity': {'2': {'partNum': 2}, '1': {'partNum': 1}, '0': {'partNum': 0}}
+                }
+            ]
+        }
+    TOPIC_IDENTITIES_RV = [
+                    {'topic':'topic_name', 'partitionsIdentity': [
+                        {'partNum': 0}, {'partNum': 1}, {'partNum': 2}]}]
+    PARTITIONS_IDENTITY_RV = [{'partNum': 0}, {'partNum': 1}, {'partNum': 2}]
 
     @patch('krux_kafka_manager.kafka_manager_api.get_stats')
     @patch('krux_kafka_manager.kafka_manager_api.get_logger')
@@ -64,7 +88,7 @@ class KafkaManagerTest(unittest.TestCase):
         mock_args = MagicMock(hostname=KafkaManagerTest._HOSTNAME)
         manager = get_kafka_manager_api(mock_args, self.mock_logger, self.mock_stats)
         mock_kafka_manager.assert_called_once_with(
-                hostname='test_hostname',
+                hostname=KafkaManagerTest._HOSTNAME,
                 logger=self.mock_logger,
                 stats=self.mock_stats,
                 )
@@ -100,12 +124,12 @@ class KafkaManagerTest(unittest.TestCase):
         Kafka Manager API Test: Checks if get_kafka_manager_api initalizes KafkaManagerAPI object
         with no user inputs provided (except mandatory hostname argument)
         """
-        mock_parser.return_value.parse_args.return_value = MagicMock(hostname='test_hostname')
+        mock_parser.return_value.parse_args.return_value = MagicMock(hostname=KafkaManagerTest._HOSTNAME)
         mock_kafka_manager.return_value = MagicMock()
         manager = get_kafka_manager_api()
         mock_cli_args.assert_called_once_with(mock_parser(description=NAME))
         mock_kafka_manager.assert_called_once_with(
-            hostname = 'test_hostname',
+            hostname = KafkaManagerTest._HOSTNAME,
             logger=mock_logger(name=NAME),
             stats=mock_stats(prefix=NAME),
             )
@@ -115,34 +139,45 @@ class KafkaManagerTest(unittest.TestCase):
         """
         Kafka Manager API Test: Checks if get_cluster_list method correctly returns list of clusters for hostname.
         """
-        mock_requests.get.return_value.json.return_value = {'clusters':[{'name': 'cluster1', 'status': 'active'}]}
-        cluster_list = self.manager.get_cluster_list('params')
+        mock_requests.get.return_value.json.return_value = KafkaManagerTest.CLUSTER_LIST_REQUEST
+        cluster_list = self.manager.get_cluster_list(KafkaManagerTest.PARAMS)
         mock_requests.get.assert_called_once_with('{hostname}/api/status/clusters'.format(
-            hostname=KafkaManagerTest._HOSTNAME), params='params')
-        self.assertEqual(cluster_list, [{'name': 'cluster1', 'status': 'active'}])
+            hostname=KafkaManagerTest._HOSTNAME), params=KafkaManagerTest.PARAMS)
+        self.assertEqual(cluster_list, KafkaManagerTest.CLUSTER_LIST_RV)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_cluster_list_status(self, mock_requests):
-        mock_requests.get.return_value.json.return_value = {
-            'clusters': { 
-                'active': [{'name': 'cluster1', 'status': 'active'}],
-                'pending': [{'name': 'cluster2', 'status': 'pending'}]
-            }
-        }
-        cluster_list = self.manager.get_cluster_list(params=None, status='pending')
+        mock_requests.get.return_value.json.return_value = KafkaManagerTest.CLUSTER_LIST_STATUS
+        cluster_list = self.manager.get_cluster_list(params=None, status=KafkaManagerTest.STATUS)
         mock_requests.get.assert_called_once_with('{hostname}/api/status/clusters'.format(
             hostname=KafkaManagerTest._HOSTNAME), params=None)
-        self.assertEqual(cluster_list, [{'name': 'cluster2', 'status': 'pending'}])
+        self.assertEqual(cluster_list, KafkaManagerTest.CLUSTER_LIST_RV)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_topic_identities(self, mock_requests):
         """
         Kafka Manager API Test: Checks if get_topic_identities method correctly returns topic identities
-        for all topics for given cluster.
+        for all topics for given cluster, and organizes partitionsIdentity into list of dictionaries
+        ordered by partNum.
         """
-        mock_requests.get.return_value.json.return_value = {'topicIdentities':[{'topic':'topic_name','partitions':50,'numBrokers':1}]}
-        topic_identities = self.manager.get_topic_identities('cluster')
+        mock_requests.get.return_value.json.return_value = KafkaManagerTest.TOPIC_IDENTITIES_REQUEST
+        topic_identities = self.manager.get_topic_identities(KafkaManagerTest.CLUSTER)
         mock_requests.get.assert_called_once_with('{hostname}/api/status/{cluster}/topicIdentities'.format(
             hostname=KafkaManagerTest._HOSTNAME,
-            cluster='cluster'))
-        self.assertEqual(topic_identities, [{'topic':'topic_name','partitions':50,'numBrokers':1}])
+            cluster=KafkaManagerTest.CLUSTER))
+        self.assertEqual(topic_identities, KafkaManagerTest.TOPIC_IDENTITIES_RV)
+
+    @patch('krux_kafka_manager.kafka_manager_api.requests')
+    def test_get_partitions_identity_valid_input(self, mock_requests):
+        self.manager.get_topic_identities = MagicMock(return_value = KafkaManagerTest.TOPIC_IDENTITIES_RV)
+        partitions_identity = self.manager.get_partitions_identity(KafkaManagerTest.CLUSTER, KafkaManagerTest.TOPIC)
+        self.manager.get_topic_identities.assert_called_once_with(KafkaManagerTest.CLUSTER)
+        self.assertEqual(partitions_identity, KafkaManagerTest.PARTITIONS_IDENTITY_RV)
+
+    @patch('krux_kafka_manager.kafka_manager_api.requests')
+    def test_get_partitions_identity_invalid_input(self, mock_requests):
+        self.manager.get_topic_identities = MagicMock(return_value = KafkaManagerTest.TOPIC_IDENTITIES_RV)
+        partitions_identity = self.manager.get_partitions_identity(KafkaManagerTest.CLUSTER, 'wrong_topic')
+        self.manager.get_topic_identities.assert_called_once_with(KafkaManagerTest.CLUSTER)
+        self.assertEqual(partitions_identity, [])
+
