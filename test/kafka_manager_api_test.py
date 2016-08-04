@@ -29,7 +29,6 @@ class KafkaManagerTest(unittest.TestCase):
     _HOSTNAME = 'test_hostname'
     CLUSTER = 'cluster'
     TOPIC = 'topic_name'
-    PARAMS = 'params'
     STATUS = 'active'
     CLUSTER_LIST_REQUEST = {'clusters':[{'name': 'cluster1', 'status': 'active'}]}
     CLUSTER_LIST_STATUS = {
@@ -132,17 +131,17 @@ class KafkaManagerTest(unittest.TestCase):
         Kafka Manager API Test: Checks if get_cluster_list method correctly returns list of clusters for hostname.
         """
         mock_requests.get.return_value.json.return_value = KafkaManagerTest.CLUSTER_LIST_REQUEST
-        cluster_list = self.manager.get_cluster_list(KafkaManagerTest.PARAMS)
+        cluster_list = self.manager.get_cluster_list()
         mock_requests.get.assert_called_once_with('{hostname}/api/status/clusters'.format(
-            hostname=KafkaManagerTest._HOSTNAME), params=KafkaManagerTest.PARAMS)
+            hostname=KafkaManagerTest._HOSTNAME))
         self.assertEqual(cluster_list, KafkaManagerTest.CLUSTER_LIST_RV)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_cluster_list_status(self, mock_requests):
         mock_requests.get.return_value.json.return_value = KafkaManagerTest.CLUSTER_LIST_STATUS
-        cluster_list = self.manager.get_cluster_list(params=None, status=KafkaManagerTest.STATUS)
+        cluster_list = self.manager.get_cluster_list(status=KafkaManagerTest.STATUS)
         mock_requests.get.assert_called_once_with('{hostname}/api/status/clusters'.format(
-            hostname=KafkaManagerTest._HOSTNAME), params=None)
+            hostname=KafkaManagerTest._HOSTNAME))
         self.assertEqual(cluster_list, KafkaManagerTest.CLUSTER_LIST_RV)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')

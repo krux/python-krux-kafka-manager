@@ -80,12 +80,12 @@ class KafkaManagerAPI(object):
         self._stats = stats or get_stats(prefix=self._name)
         self._hostname = hostname
 
-    def get_cluster_list(self, params=None, status=None):
+    def get_cluster_list(self, status=None):
         """
         Returns list containing dictionaries of information for each cluster. User can filter for clusters
         with certain status, else all clusters are returned.
         """
-        request_cluster_list = requests.get('{hostname}/api/status/clusters'.format(hostname=self._hostname), params=params)
+        request_cluster_list = requests.get('{hostname}/api/status/clusters'.format(hostname=self._hostname))
         cluster_list = request_cluster_list.json()['clusters']
         if status:
             return cluster_list[status]
