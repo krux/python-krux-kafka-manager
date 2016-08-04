@@ -99,13 +99,3 @@ class KafkaManagerAPI(object):
         request_topic_identities = requests.get('{hostname}/api/status/{cluster}/topicIdentities'.format(hostname=self._hostname, cluster=cluster))
         topic_identities = request_topic_identities.json()['topicIdentities']
         return topic_identities
-
-    def get_partitions_identity(self, cluster, topic):
-        """
-        Returns list of partition identities for topic of given cluster.
-        """
-        topic_identities = self.get_topic_identities(cluster)
-        for topic_identity in topic_identities:
-            if topic_identity['topic'] == topic:
-                return topic_identity['partitionsIdentity']
-        return []
