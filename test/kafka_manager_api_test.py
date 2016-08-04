@@ -169,6 +169,10 @@ class KafkaManagerTest(unittest.TestCase):
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_partitions_identity_valid_input(self, mock_requests):
+        """
+        Kafka Manager API Test: Checks if get_partitions_identity finds correct partitions identity for given
+        cluster and topic.
+        """
         self.manager.get_topic_identities = MagicMock(return_value = KafkaManagerTest.TOPIC_IDENTITIES_RV)
         partitions_identity = self.manager.get_partitions_identity(KafkaManagerTest.CLUSTER, KafkaManagerTest.TOPIC)
         self.manager.get_topic_identities.assert_called_once_with(KafkaManagerTest.CLUSTER)
@@ -176,6 +180,10 @@ class KafkaManagerTest(unittest.TestCase):
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_partitions_identity_invalid_input(self, mock_requests):
+        """
+        Kafka Manager API Test: Checks if get_partitions_identity returns empty list if topic does not
+        exist in topic identities.
+        """
         self.manager.get_topic_identities = MagicMock(return_value = KafkaManagerTest.TOPIC_IDENTITIES_RV)
         partitions_identity = self.manager.get_partitions_identity(KafkaManagerTest.CLUSTER, 'wrong_topic')
         self.manager.get_topic_identities.assert_called_once_with(KafkaManagerTest.CLUSTER)
