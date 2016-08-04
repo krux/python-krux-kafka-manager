@@ -29,19 +29,12 @@ class KafkaManagerTest(unittest.TestCase):
     _HOSTNAME = 'test_hostname'
     CLUSTER = 'cluster'
     TOPIC = 'topic_name'
-    STATUS = 'active'
-    CLUSTER_LIST_REQUEST = {'clusters':[{'name': 'cluster1', 'status': 'active'}]}
-    CLUSTER_LIST_STATUS = {
-            'clusters': { 
-                'active': [{'name': 'cluster1', 'status': 'active'}],
-                'pending': [{'name': 'cluster2', 'status': 'pending'}]
-            }
-        }
-    CLUSTER_LIST_RV =  [{'name': 'cluster1', 'status': 'active'}]
-    TOPIC_IDENTITIES_REQUEST = {'topicIdentities': [{'topic':'topic_name', 'partitionsIdentity':
-                        [{'partNum': 0}, {'partNum': 1}, {'partNum': 2}]}]}
-    TOPIC_IDENTITIES_RV =  [{'topic':'topic_name', 'partitionsIdentity': [{'partNum': 0}, {'partNum': 1}, {'partNum': 2}]}]
-    PARTITIONS_IDENTITY_RV = [{'partNum': 0}, {'partNum': 1}, {'partNum': 2}]
+    STATUS = 'active' 
+    CLUSTER_LIST_STATUS_RV =  [{'name': 'cluster1'}]
+    CLUSTER_LIST_RV = {STATUS: CLUSTER_LIST_STATUS_RV}
+    CLUSTER_LIST_STATUS = {'clusters': CLUSTER_LIST_RV}
+    TOPIC_IDENTITIES_RV =  [{'topic': TOPIC, 'partitionsIdentity': [{'partNum': 0}, {'partNum': 1}, {'partNum': 2}]}]
+    TOPIC_IDENTITIES_REQUEST = {'topicIdentities': TOPIC_IDENTITIES_RV}
 
     @patch('krux_kafka_manager.kafka_manager_api.get_stats')
     @patch('krux_kafka_manager.kafka_manager_api.get_logger')
@@ -116,7 +109,6 @@ class KafkaManagerTest(unittest.TestCase):
         with no user inputs provided (except mandatory hostname argument)
         """
         mock_parser.return_value.parse_args.return_value = MagicMock(hostname=KafkaManagerTest._HOSTNAME)
-        mock_kafka_manager.return_value = MagicMock()
         manager = get_kafka_manager_api()
         mock_cli_args.assert_called_once_with(mock_parser(description=NAME))
         mock_kafka_manager.assert_called_once_with(
@@ -130,7 +122,7 @@ class KafkaManagerTest(unittest.TestCase):
         """
         Kafka Manager API Test: Checks if get_cluster_list method correctly returns list of clusters for hostname.
         """
-        mock_requests.get.return_value.json.return_value = KafkaManagerTest.CLUSTER_LIST_REQUEST
+        mock_requests.get.return_value.json.return_value = KafkaManagerTest.CLUSTER_LIST_STATUS
         cluster_list = self.manager.get_cluster_list()
         mock_requests.get.assert_called_once_with('{hostname}/api/status/clusters'.format(
             hostname=KafkaManagerTest._HOSTNAME))
@@ -142,7 +134,7 @@ class KafkaManagerTest(unittest.TestCase):
         cluster_list = self.manager.get_cluster_list(status=KafkaManagerTest.STATUS)
         mock_requests.get.assert_called_once_with('{hostname}/api/status/clusters'.format(
             hostname=KafkaManagerTest._HOSTNAME))
-        self.assertEqual(cluster_list, KafkaManagerTest.CLUSTER_LIST_RV)
+        self.assertEqual(cluster_list, KafkaManagerTest.CLUSTER_LIST_STATUS_RV)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_topic_identities(self, mock_requests):

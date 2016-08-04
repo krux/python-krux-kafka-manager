@@ -41,14 +41,8 @@ class Application(krux.cli.Application):
         group = krux.cli.get_group(parser, self.name)
 
     def run(self):
-        topic_identities = self.kafka_manager_api.get_topic_identities('krux-manager-test')
-        self.logger.info(pformat(topic_identities))
-
-        get_cluster_list = self.kafka_manager_api.get_cluster_list(status='active')
+        get_cluster_list = self.kafka_manager_api.get_cluster_list()
         self.logger.info(pformat(get_cluster_list))
-
-        partitions_identity = self.kafka_manager_api.get_partitions_identity('krux-manager-test', '__consumer_offsets')
-        self.logger.info(pformat(partitions_identity))
 
 
 def main():

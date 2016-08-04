@@ -65,11 +65,8 @@ class CLItest(unittest.TestCase):
         """
         CLI Test: Kafka Manager API's get_topic_identities method is correctly called in self.app.run()
         """
-        self.mock_get_manager().get_topic_identities.return_value = CLItest._EXAMPLE_LIST
         self.app.run()
-
-        self.mock_get_manager().get_topic_identities.assert_called_once_with('krux-manager-test')
-        self.mock_get_logger().info.assert_called_once_with(CLItest._EXAMPLE_LIST)
+        self.mock_get_manager().get_cluster_list.assert_called_once_with()
 
     def test_main(self):
         """
