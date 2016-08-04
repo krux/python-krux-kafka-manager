@@ -146,7 +146,7 @@ class KafkaManagerTest(unittest.TestCase):
         self.assertEqual(cluster_list, KafkaManagerTest.CLUSTER_LIST_RV)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
-    def test_get_topic_identities(self, mock_requests): #FIX
+    def test_get_topic_identities(self, mock_requests):
         """
         Kafka Manager API Test: Checks if get_topic_identities method correctly returns topic identities
         for all topics for given cluster, and organizes partitionsIdentity into list of dictionaries
@@ -160,7 +160,7 @@ class KafkaManagerTest(unittest.TestCase):
         self.assertEqual(topic_identities, KafkaManagerTest.TOPIC_IDENTITIES_RV)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
-    def test_get_partitions_identity_valid_input(self, mock_requests): #FIX
+    def test_get_partitions_identity_valid_input(self, mock_requests):
         """
         Kafka Manager API Test: Checks if get_partitions_identity finds correct partitions identity for given
         cluster and topic.
@@ -172,7 +172,7 @@ class KafkaManagerTest(unittest.TestCase):
         self.assertEqual(partitions_identity, KafkaManagerTest.PARTITIONS_IDENTITY_RV)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
-    def test_get_partitions_identity_invalid_input(self, mock_requests): #FIX
+    def test_get_partitions_identity_invalid_input(self, mock_requests):
         """
         Kafka Manager API Test: Checks if get_partitions_identity returns empty list if topic does not
         exist in topic identities.
