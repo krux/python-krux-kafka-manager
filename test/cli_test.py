@@ -28,9 +28,6 @@ from krux_kafka_manager.kafka_manager_api import KafkaManagerAPI
 
 class CLItest(unittest.TestCase):
 
-    _BROKER_SKEW_INT = 0
-    _EXAMPLE_LIST = ['1', '2', '3']
-
     @patch('krux_kafka_manager.cli.krux.cli.krux.logging.get_logger')
     @patch('krux_kafka_manager.cli.get_kafka_manager_api')
     @patch('sys.argv', ['krux-kafka', 'http://localhost:9000'])
