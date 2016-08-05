@@ -27,10 +27,10 @@ from krux_kafka_manager.kafka_manager_api import KafkaManagerAPI, get_kafka_mana
 class KafkaManagerTest(unittest.TestCase):
 
     _HOSTNAME = 'test_hostname'
-    CLUSTER = 'cluster'
+    CLUSTER = 'cluster_name'
     TOPIC = 'topic_name'
     STATUS = 'active' 
-    CLUSTER_LIST_STATUS_RV =  [{'name': 'cluster1'}]
+    CLUSTER_LIST_STATUS_RV =  [{'name': CLUSTER}]
     CLUSTER_LIST_RV = {STATUS: CLUSTER_LIST_STATUS_RV}
     CLUSTER_LIST_STATUS = {'clusters': CLUSTER_LIST_RV}
     TOPIC_IDENTITIES_RV =  [{'topic': TOPIC, 'partitionsIdentity': [{'partNum': 0}, {'partNum': 1}, {'partNum': 2}]}]
