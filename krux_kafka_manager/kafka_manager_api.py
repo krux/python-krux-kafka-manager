@@ -93,8 +93,7 @@ class KafkaManagerAPI(object):
 
     def get_topic_identities(self, cluster):
         """
-        Returns dictionary containing list of topic identities for given cluster. Partitions identity formatted
-        into ordered list for easier use.
+        Returns dictionary containing list of topic identities for given cluster.
         """
         request_topic_identities = requests.get('{hostname}/api/status/{cluster}/topicIdentities'.format(hostname=self._hostname, cluster=cluster))
         topic_identities = request_topic_identities.json()['topicIdentities']
