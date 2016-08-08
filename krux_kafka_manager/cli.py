@@ -11,6 +11,7 @@ CLI tools for accessing Krux Kafka Clusters
 #
 
 from __future__ import absolute_import
+from pprint import pformat
 
 #
 # Internal libraries
@@ -40,8 +41,8 @@ class Application(krux.cli.Application):
         group = krux.cli.get_group(parser, self.name)
 
     def run(self):
-        get_brokers_skew = self.kafka_manager_api.get_brokers_skew('krux-manager-test', 'test')
-        self.logger.info(get_brokers_skew)
+        get_cluster_list = self.kafka_manager_api.get_cluster_list()
+        self.logger.info(pformat(get_cluster_list))
 
 
 def main():
