@@ -38,7 +38,6 @@ class Application(krux.cli.Application):
         super(Application, self).add_cli_arguments(parser)
 
         add_kafka_manager_api_cli_arguments(parser)
-        group = krux.cli.get_group(parser, self.name)
 
     def run(self):
         get_cluster_list = self.kafka_manager_api.get_cluster_list()

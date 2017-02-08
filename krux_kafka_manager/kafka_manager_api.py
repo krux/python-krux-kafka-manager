@@ -45,6 +45,7 @@ def get_kafka_manager_api(args=None, logger=None, stats=None):
 
     return KafkaManagerAPI(
         hostname=args.hostname,
+        use_ssl=args.use_ssl,
         logger=logger,
         stats=stats,
     )
@@ -58,9 +59,17 @@ def add_kafka_manager_api_cli_arguments(parser):
     group = get_group(parser, NAME)
 
     group.add_argument(
-        "hostname",
+        'hostname',
         type=str,
-        help="Kafka Manager hostname.",
+        help='Kafka Manager hostname.',
+    )
+
+    group.add_argument(
+        '--no-use-ssl',
+        action='store_false',
+        dest='use_ssl',
+        default=True,
+        help='Set this flag to turn off HTTPS and use HTTP'
     )
 
 
@@ -68,9 +77,13 @@ class KafkaManagerAPI(object):
     """
     A manager to handle all Kafka Manager related functions.
     """
+
+    _URL_TEMPLATE = '{protocol}://{hostname}/api'
+
     def __init__(
         self,
         hostname,
+        use_ssl=True,
         logger=None,
         stats=None,
     ):
@@ -79,13 +92,21 @@ class KafkaManagerAPI(object):
         self._logger = logger or get_logger(self._name)
         self._stats = stats or get_stats(prefix=self._name)
         self._hostname = hostname
+        self._protocol = 'https' if use_ssl else 'http'
+
+    @property
+    def base_url(self):
+        return self._URL_TEMPLATE.format(
+            protocol=self._protocol,
+            hostname=self._hostname,
+        )
 
     def get_cluster_list(self, status=None):
         """
         Returns list containing dictionaries of information for each cluster. User can filter for clusters
         with certain status, else all clusters are returned.
         """
-        request_cluster_list = requests.get('{hostname}/api/status/clusters'.format(hostname=self._hostname))
+        request_cluster_list = requests.get('{base_url}/status/clusters'.format(base_url=self.base_url))
         cluster_list = request_cluster_list.json()['clusters']
         if status:
             return cluster_list[status]
@@ -95,6 +116,8 @@ class KafkaManagerAPI(object):
         """
         Returns dictionary containing list of topic identities for given cluster.
         """
-        request_topic_identities = requests.get('{hostname}/api/status/{cluster}/topicIdentities'.format(hostname=self._hostname, cluster=cluster))
+        request_topic_identities = requests.get(
+            '{base_url}/status/{cluster}/topicIdentities'.format(base_url=self.base_url, cluster=cluster)
+        )
         topic_identities = request_topic_identities.json()['topicIdentities']
         return topic_identities
