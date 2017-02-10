@@ -43,7 +43,7 @@ def get_kafka_manager_api(args=None, logger=None, stats=None):
     if not stats:
         stats = get_stats(prefix=NAME)
 
-    return KafkaManagerAPI(
+    return KafkaManager(
         hostname=args.hostname,
         use_ssl=args.use_ssl,
         logger=logger,
@@ -73,12 +73,14 @@ def add_kafka_manager_api_cli_arguments(parser):
     )
 
 
-class KafkaManagerAPI(object):
+class KafkaManagerApiError(Exception):
+    pass
+
+
+class KafkaManager(object):
     """
     A manager to handle all Kafka Manager related functions.
     """
-
-    _URL_TEMPLATE = '{protocol}://{hostname}/api'
 
     def __init__(
         self,
@@ -94,30 +96,46 @@ class KafkaManagerAPI(object):
         self._hostname = hostname
         self._protocol = 'https' if use_ssl else 'http'
 
-    @property
-    def base_url(self):
-        return self._URL_TEMPLATE.format(
-            protocol=self._protocol,
-            hostname=self._hostname,
+    def _call(self, method, url):
+        res = requests.request(
+            method=method,
+            url='{protocol}://{hostname}/api/{url}'.format(
+                protocol=self._protocol,
+                hostname=self._hostname,
+                url=url,
+            )
         )
+
+        if res.status_code < 200 or res.status_code > 299:
+            msg = "{status_code} {reason} was returned. Body: {body}".format(
+                status_code=res.status_code,
+                reason=res.reason,
+                body=res.content,
+            )
+            raise KafkaManagerApiError(msg)
+
+        return res.json()
 
     def get_cluster_list(self, status=None):
         """
         Returns list containing dictionaries of information for each cluster. User can filter for clusters
         with certain status, else all clusters are returned.
         """
-        request_cluster_list = requests.get('{base_url}/status/clusters'.format(base_url=self.base_url))
-        cluster_list = request_cluster_list.json()['clusters']
+        cluster_list = self._call(
+            method='GET',
+            url='status/clusters',
+        )['clusters']
+
         if status:
             return cluster_list[status]
+
         return cluster_list
 
     def get_topic_identities(self, cluster):
         """
         Returns dictionary containing list of topic identities for given cluster.
         """
-        request_topic_identities = requests.get(
-            '{base_url}/status/{cluster}/topicIdentities'.format(base_url=self.base_url, cluster=cluster)
-        )
-        topic_identities = request_topic_identities.json()['topicIdentities']
-        return topic_identities
+        return self._call(
+            method='GET',
+            url='status/{cluster}/topicIdentities'.format(cluster=cluster),
+        )['topicIdentities']
