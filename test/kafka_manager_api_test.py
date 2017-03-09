@@ -9,7 +9,6 @@
 
 from __future__ import absolute_import
 import unittest
-import sys
 
 #
 # Third party libraries
@@ -21,110 +20,175 @@ from mock import MagicMock, patch
 # Internal libraries
 #
 
-from krux_kafka_manager.kafka_manager_api import KafkaManagerAPI, get_kafka_manager_api, NAME
+from krux_kafka_manager.kafka_manager_api import KafkaManager, get_kafka_manager_api, NAME
 
 
-class KafkaManagerTest(unittest.TestCase):
+class GetKafkaManagerTest(unittest.TestCase):
+    FAKE_HOSTNAME = 'fake.krxd.net'
+    FAKE_USE_SSL = False
 
-    _HOSTNAME = 'test_hostname'
-    CLUSTER = 'cluster_name'
-    TOPIC = 'topic_name'
-    STATUS = 'active' 
-    CLUSTER_LIST_STATUS_RV =  [{'name': CLUSTER}]
-    CLUSTER_LIST_RV = {STATUS: CLUSTER_LIST_STATUS_RV}
-    CLUSTER_LIST_STATUS = {'clusters': CLUSTER_LIST_RV}
-    TOPIC_IDENTITIES_RV =  [{'topic': TOPIC, 'partitionsIdentity': [{'partNum': 0}, {'partNum': 1}, {'partNum': 2}]}]
-    TOPIC_IDENTITIES_REQUEST = {'topicIdentities': TOPIC_IDENTITIES_RV}
-
-    @patch('krux_kafka_manager.kafka_manager_api.get_stats')
-    @patch('krux_kafka_manager.kafka_manager_api.get_logger')
-    def setUp(self, mock_logger, mock_stats):
-        self.mock_logger = mock_logger
-        self.mock_stats = mock_stats
-        self.manager = KafkaManagerAPI(hostname=KafkaManagerTest._HOSTNAME)
-
-    def test_KafkaManagerAPI_all_init(self):
-        """
-        Kafka Manager API Test: Checks if KafkaManagerAPI initialized property if all user
-        inputs provided.
-        """
-        manager = KafkaManagerAPI(KafkaManagerTest._HOSTNAME, self.mock_logger, self.mock_stats)
-        self.assertIn(KafkaManagerTest._HOSTNAME, manager._hostname)
-        self.assertIn(NAME, manager._name)
-        self.assertEqual(self.mock_logger, manager._logger)
-        self.assertEqual(self.mock_stats, manager._stats)
-
-    def test_KafkaManagerAPI_only_hostname(self):
-        """
-        Kafka Manager API Test: Checks if KafkaManagerAPI initialized properly with no user
-        inputs except (required) hostname.
-        """
-        self.mock_logger.assert_called_once_with(self.manager._name)
-        self.mock_stats.assert_called_once_with(prefix=self.manager._name)
-
-    @patch('krux_kafka_manager.kafka_manager_api.KafkaManagerAPI')
+    @patch('krux_kafka_manager.kafka_manager_api.KafkaManager')
     def test_get_kafka_manager_api_all_inputs(self, mock_kafka_manager):
         """
-        Checks if get_kafka_manager_api initalizes KafkaManagerAPI object with all user inputs
-        provided (except mandatory hostname argument).
+        get_kafka_manager_api() correctly initializes KafkaManager object if all parameters are given
         """
-        mock_kafka_manager.return_value = MagicMock()
-        mock_args = MagicMock(hostname=KafkaManagerTest._HOSTNAME)
-        manager = get_kafka_manager_api(mock_args, self.mock_logger, self.mock_stats)
+        args = MagicMock(hostname=self.FAKE_HOSTNAME, use_ssl=self.FAKE_USE_SSL)
+        logger = MagicMock()
+        stats = MagicMock()
+
+        get_kafka_manager_api(args, logger, stats)
+
         mock_kafka_manager.assert_called_once_with(
-                hostname=KafkaManagerTest._HOSTNAME,
-                logger=self.mock_logger,
-                stats=self.mock_stats,
-                )
+            hostname=GetKafkaManagerTest.FAKE_HOSTNAME,
+            use_ssl=GetKafkaManagerTest.FAKE_USE_SSL,
+            logger=logger,
+            stats=stats,
+        )
 
     @patch('krux_kafka_manager.kafka_manager_api.get_stats')
     @patch('krux_kafka_manager.kafka_manager_api.get_logger')
     @patch('krux_kafka_manager.kafka_manager_api.get_parser')
     @patch('krux_kafka_manager.kafka_manager_api.add_kafka_manager_api_cli_arguments')
-    @patch('krux_kafka_manager.kafka_manager_api.KafkaManagerAPI')
+    @patch('krux_kafka_manager.kafka_manager_api.KafkaManager')
     def test_get_kafka_api_no_inputs(self, mock_kafka_manager, mock_cli_args, mock_parser, mock_logger, mock_stats):
         """
-        Kafka Manager API Test: Checks if get_kafka_manager_api initalizes KafkaManagerAPI object
-        with no user inputs provided (except mandatory hostname argument)
+        get_kafka_manager_api() correctly initializes KafkaManager object if no parameters are given
         """
-        mock_parser.return_value.parse_args.return_value = MagicMock(hostname=KafkaManagerTest._HOSTNAME)
-        manager = get_kafka_manager_api()
-        mock_cli_args.assert_called_once_with(mock_parser(description=NAME))
+        mock_parser.return_value.parse_args.return_value = MagicMock(
+            hostname=GetKafkaManagerTest.FAKE_HOSTNAME,
+            use_ssl=GetKafkaManagerTest.FAKE_USE_SSL,
+        )
+
+        get_kafka_manager_api()
+
+        mock_parser.assert_called_once_with(description=NAME)
+        mock_cli_args.assert_called_once_with(mock_parser.return_value)
+        mock_logger.assert_called_once_with(name=NAME)
+        mock_stats.assert_called_once_with(prefix=NAME)
+
         mock_kafka_manager.assert_called_once_with(
-            hostname = KafkaManagerTest._HOSTNAME,
-            logger=mock_logger(name=NAME),
-            stats=mock_stats(prefix=NAME),
-            )
+            hostname=GetKafkaManagerTest.FAKE_HOSTNAME,
+            use_ssl=GetKafkaManagerTest.FAKE_USE_SSL,
+            logger=mock_logger.return_value,
+            stats=mock_stats.return_value,
+        )
+
+
+class KafkaManagerTest(unittest.TestCase):
+
+    HOSTNAME = 'test_hostname'
+    USE_SSL = False
+    PROTOCOL = 'https' if USE_SSL else 'http'
+    CLUSTER = 'cluster_name'
+    TOPIC = 'topic_name'
+    STATUS = 'active'
+    ACTIVE_CLUSTERS = [{'name': CLUSTER}]
+    PENDING_CLUSTERS = [{'name': 'pending_cluster'}]
+    CLUSTERS_PER_STATUS = {STATUS: ACTIVE_CLUSTERS, 'pending': PENDING_CLUSTERS}
+    TOPIC_IDENTITIES = [{'topic': TOPIC, 'partitionsIdentity': [{'partNum': 0}, {'partNum': 1}, {'partNum': 2}]}]
+
+    def setUp(self):
+        self._logger = MagicMock()
+        self._stats = MagicMock()
+        self._manager = KafkaManager(
+            hostname=KafkaManagerTest.HOSTNAME,
+            use_ssl=KafkaManagerTest.USE_SSL,
+            logger=self._logger,
+            stats=self._stats
+        )
+
+    def test_KafkaManagerAPI_all_init(self):
+        """
+        KafkaManager.__init__() correctly initializes properties if all parameters are given
+        """
+        self.assertEqual(NAME, self._manager._name)
+        self.assertEqual(self._logger, self._manager._logger)
+        self.assertEqual(self._stats, self._manager._stats)
+
+        self.assertEqual(KafkaManagerTest.HOSTNAME, self._manager._hostname)
+        self.assertEqual('http', self._manager._protocol)
+
+    @patch('krux_kafka_manager.kafka_manager_api.get_logger')
+    @patch('krux_kafka_manager.kafka_manager_api.get_stats')
+    def test_KafkaManagerAPI_only_hostname(self, mock_stats, mock_logger):
+        """
+        KafkaManager.__init__() correctly initializes properties if only mandatory parameters are given
+        """
+        manager = KafkaManager(
+            hostname=KafkaManagerTest.HOSTNAME,
+        )
+        mock_logger.assert_called_once_with(NAME)
+        mock_stats.assert_called_once_with(prefix=NAME)
+        self.assertEqual(mock_logger.return_value, manager._logger)
+        self.assertEqual(mock_stats.return_value, manager._stats)
+        self.assertEqual('https', manager._protocol)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_cluster_list(self, mock_requests):
         """
-        Kafka Manager API Test: Checks if get_cluster_list method correctly returns list of clusters for hostname.
+        KafkaManager.get_cluster_list() correctly returns list of clusters for hostname.
         """
-        mock_requests.get.return_value.json.return_value = KafkaManagerTest.CLUSTER_LIST_STATUS
-        cluster_list = self.manager.get_cluster_list()
-        mock_requests.get.assert_called_once_with('{hostname}/api/status/clusters'.format(
-            hostname=KafkaManagerTest._HOSTNAME))
-        self.assertEqual(cluster_list, KafkaManagerTest.CLUSTER_LIST_RV)
+        mock_requests.request.return_value = MagicMock(
+            status_code=200,
+            json=MagicMock(
+                return_value={
+                    'clusters': KafkaManagerTest.CLUSTERS_PER_STATUS,
+                },
+            ),
+        )
+
+        cluster_list = self._manager.get_cluster_list()
+
+        mock_requests.request.assert_called_once_with(
+            method='GET',
+            url='{protocol}://{hostname}/api/status/clusters'.format(
+                hostname=KafkaManagerTest.HOSTNAME,
+                protocol=KafkaManagerTest.PROTOCOL,
+            )
+        )
+        self.assertEqual(cluster_list, KafkaManagerTest.CLUSTERS_PER_STATUS)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_cluster_list_status(self, mock_requests):
-        mock_requests.get.return_value.json.return_value = KafkaManagerTest.CLUSTER_LIST_STATUS
-        cluster_list = self.manager.get_cluster_list(status=KafkaManagerTest.STATUS)
-        mock_requests.get.assert_called_once_with('{hostname}/api/status/clusters'.format(
-            hostname=KafkaManagerTest._HOSTNAME))
-        self.assertEqual(cluster_list, KafkaManagerTest.CLUSTER_LIST_STATUS_RV)
+        """
+        KafkaManager.get_cluster_list() correctly returns list of clusters for hostname.
+        """
+        mock_requests.request.return_value = MagicMock(
+            status_code=200,
+            json=MagicMock(
+                return_value={
+                    'clusters': KafkaManagerTest.CLUSTERS_PER_STATUS,
+                },
+            ),
+        )
+
+        cluster_list = self._manager.get_cluster_list(status=KafkaManagerTest.STATUS)
+
+        self.assertEqual(cluster_list, KafkaManagerTest.ACTIVE_CLUSTERS)
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_topic_identities(self, mock_requests):
         """
-        Kafka Manager API Test: Checks if get_topic_identities method correctly returns topic identities
-        for all topics for given cluster, and organizes partitionsIdentity into list of dictionaries
-        ordered by partNum.
+        KafkaManager.get_topic_identities() method correctly returns topic identities for all topics for given cluster
         """
-        mock_requests.get.return_value.json.return_value = KafkaManagerTest.TOPIC_IDENTITIES_REQUEST
-        topic_identities = self.manager.get_topic_identities(KafkaManagerTest.CLUSTER)
-        mock_requests.get.assert_called_once_with('{hostname}/api/status/{cluster}/topicIdentities'.format(
-            hostname=KafkaManagerTest._HOSTNAME,
-            cluster=KafkaManagerTest.CLUSTER))
-        self.assertEqual(topic_identities, KafkaManagerTest.TOPIC_IDENTITIES_RV)
+        mock_requests.request.return_value = MagicMock(
+            status_code=200,
+            json=MagicMock(
+                return_value={
+                    'topicIdentities': KafkaManagerTest.TOPIC_IDENTITIES,
+                },
+            ),
+        )
+
+        topic_identities = self._manager.get_topic_identities(KafkaManagerTest.CLUSTER)
+
+        mock_requests.request.assert_called_once_with(
+            method='GET',
+            url='{protocol}://{hostname}/api/status/{cluster}/topicIdentities'.format(
+                hostname=KafkaManagerTest.HOSTNAME,
+                protocol=KafkaManagerTest.PROTOCOL,
+                cluster=KafkaManagerTest.CLUSTER
+            )
+        )
+
+        self.assertEqual(topic_identities, KafkaManagerTest.TOPIC_IDENTITIES)

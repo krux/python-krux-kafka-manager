@@ -9,7 +9,6 @@
 
 from __future__ import absolute_import
 import unittest
-import sys
 
 #
 # Third party libraries
@@ -23,7 +22,6 @@ from mock import MagicMock, patch, call
 
 from krux.stats import DummyStatsClient
 from krux_kafka_manager.cli import Application, NAME, main
-from krux_kafka_manager.kafka_manager_api import KafkaManagerAPI
 
 
 class CLItest(unittest.TestCase):
@@ -60,7 +58,7 @@ class CLItest(unittest.TestCase):
 
     def test_run(self):
         """
-        CLI Test: Kafka Manager API's get_topic_identities method is correctly called in self.app.run()
+        CLI Test: Kafka Manager API's get_cluster_list method is correctly called in self.app.run()
         """
         self.app.run()
         self.mock_get_manager().get_cluster_list.assert_called_once_with()
