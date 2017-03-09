@@ -20,7 +20,7 @@ from mock import MagicMock, patch
 # Internal libraries
 #
 
-from krux_kafka_manager.kafka_manager_api import KafkaManager, get_kafka_manager_api, NAME
+from krux_kafka_manager.kafka_manager_api import KafkaManager, get_kafka_manager_api, NAME, KafkaManagerApiError
 
 
 class GetKafkaManagerTest(unittest.TestCase):
@@ -87,6 +87,12 @@ class KafkaManagerTest(unittest.TestCase):
     CLUSTERS_PER_STATUS = {STATUS: ACTIVE_CLUSTERS, 'pending': PENDING_CLUSTERS}
     TOPIC_IDENTITIES = [{'topic': TOPIC, 'partitionsIdentity': [{'partNum': 0}, {'partNum': 1}, {'partNum': 2}]}]
 
+    TEST_ERROR_CODE = 500
+    TEST_FAILURE = 'Internal Server Error'
+    TEST_FAILURE_BODY = {
+        'error': 'This is a drill'
+    }
+
     def setUp(self):
         self._logger = MagicMock()
         self._stats = MagicMock()
@@ -122,6 +128,29 @@ class KafkaManagerTest(unittest.TestCase):
         self.assertEqual(mock_logger.return_value, manager._logger)
         self.assertEqual(mock_stats.return_value, manager._stats)
         self.assertEqual('https', manager._protocol)
+
+    @patch('krux_kafka_manager.kafka_manager_api.requests')
+    def test_request_failure(self, mock_requests):
+        """
+        KafkaManager._call() correctly handles request failure
+        """
+        mock_requests.request.return_value = MagicMock(
+            status_code=KafkaManagerTest.TEST_ERROR_CODE,
+            reason=KafkaManagerTest.TEST_FAILURE,
+            content=KafkaManagerTest.TEST_FAILURE_BODY,
+        )
+
+        with self.assertRaises(KafkaManagerApiError) as e:
+            self._manager.get_cluster_list()
+
+        self.assertEqual(
+            '{status_code} {reason} was returned. Body: {body}'.format(
+                status_code=KafkaManagerTest.TEST_ERROR_CODE,
+                reason=KafkaManagerTest.TEST_FAILURE,
+                body=KafkaManagerTest.TEST_FAILURE_BODY,
+            ),
+            str(e.exception)
+        )
 
     @patch('krux_kafka_manager.kafka_manager_api.requests')
     def test_get_cluster_list(self, mock_requests):
