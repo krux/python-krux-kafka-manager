@@ -6,9 +6,9 @@
 ######################
 # Standard Libraries #
 ######################
-import sys
 from __future__ import absolute_import
 from setuptools import setup, find_packages
+import sys
 
 # We use the version to construct the DOWNLOAD_URL.
 
