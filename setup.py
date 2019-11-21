@@ -39,9 +39,7 @@ setup(
     license='All Rights Reserved.',
     packages=find_packages(),
     # dependencies are named in requirements.pip
-    install_requires=[
-
-    ],
+    install_requires=dependencies,
     entry_points={
         'console_scripts': [
             'krux-kafka = krux_kafka_manager.cli:main',
