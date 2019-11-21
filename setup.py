@@ -6,6 +6,7 @@
 ######################
 # Standard Libraries #
 ######################
+import sys
 from __future__ import absolute_import
 from setuptools import setup, find_packages
 
@@ -20,6 +21,12 @@ REPO_URL = 'https://github.com/krux/python-krux-kafka-manager'
 DOWNLOAD_URL = ''.join((REPO_URL, '/tarball/release/', VERSION))
 
 
+# python 2 will need subprocess32
+dependencies = ['krux-stdlib', 'requests']
+if sys.version_info[0] == 2:
+    dependencies.append('subprocess32')
+    dependencies.append('argparse')
+
 # XXX these all need to be in sub dirs, or it won't work :(
 setup(
     name='krux-kafka-manager',
@@ -33,8 +40,7 @@ setup(
     packages=find_packages(),
     # dependencies are named in requirements.pip
     install_requires=[
-        'krux-stdlib',
-        'requests',
+
     ],
     entry_points={
         'console_scripts': [

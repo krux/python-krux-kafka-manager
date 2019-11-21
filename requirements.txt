@@ -14,9 +14,7 @@ requests==2.22.0
 # From krux-stdlib
 kruxstatsd==0.3.6
 statsd==3.3.0
-argparse==1.4.0
 lockfile==0.12.2
-subprocess32==3.2.7
 
 # From pip --freeze
 certifi==2019.9.11
