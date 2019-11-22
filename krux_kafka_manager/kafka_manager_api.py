@@ -7,7 +7,7 @@
 # Standard libraries
 #
 
-from __future__ import absolute_import
+
 
 #
 # Third party libraries

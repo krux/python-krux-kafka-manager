@@ -8,10 +8,11 @@
 ######################
 from __future__ import absolute_import
 from setuptools import setup, find_packages
+import sys
 
 # We use the version to construct the DOWNLOAD_URL.
 
-VERSION = '0.1.1'
+VERSION = '0.2.0'
 
 # URL to the repository on Github.
 REPO_URL = 'https://github.com/krux/python-krux-kafka-manager'
@@ -19,6 +20,12 @@ REPO_URL = 'https://github.com/krux/python-krux-kafka-manager'
 # forget to tag!
 DOWNLOAD_URL = ''.join((REPO_URL, '/tarball/release/', VERSION))
 
+
+# python 2 will need subprocess32
+dependencies = ['krux-stdlib', 'requests']
+if sys.version_info[0] == 2:
+    dependencies.append('subprocess32')
+    dependencies.append('argparse')
 
 # XXX these all need to be in sub dirs, or it won't work :(
 setup(
@@ -32,7 +39,7 @@ setup(
     license='All Rights Reserved.',
     packages=find_packages(),
     # dependencies are named in requirements.pip
-    install_requires=[],
+    install_requires=dependencies,
     entry_points={
         'console_scripts': [
             'krux-kafka = krux_kafka_manager.cli:main',

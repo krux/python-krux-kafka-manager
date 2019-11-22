@@ -10,7 +10,7 @@ CLI tools for accessing Krux Kafka Clusters
 # Standard libraries
 #
 
-from __future__ import absolute_import
+
 from pprint import pformat
 
 #
