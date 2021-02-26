@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6f169f10a2c875c4823d6edd54c5e8f3725d6c6d4b0b7ecfbde3a4be5970b3d3"
+            "sha256": "15dcb8760c9e3868b316a3ac8f0b3635d0673e47d65d6db9256c0bb26aac129b"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -18,7 +18,7 @@
             },
             {
                 "name": "pypi",
-                "url": "https://${ARTIFACTORY_USER}:${ARTIFACTORY_PASSWORD}@kruxmvn.jfrog.io/artifactory/api/pypi/pypi/simple",
+                "url": "https://pypi.python.org/simple",
                 "verify_ssl": true
             }
         ]
