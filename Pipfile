@@ -9,7 +9,7 @@ verify_ssl = true
 name = "kruxfoss"
 
 [[source]]
-url = "https://${ARTIFACTORY_USER}:${ARTIFACTORY_PASSWORD}@kruxmvn.jfrog.io/artifactory/api/pypi/pypi/simple"
+url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
